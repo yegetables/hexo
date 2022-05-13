@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="随缘更新技术文章" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>JavaFx Tips |  Copy on Write</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="https://tu.yegetables.com/images/2021/02/08/1612775550764_192x192.png" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/feed.xml" title="Copy on Write" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-学习/2021-10-14-JavaFx_tips"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  JavaFx Tips
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/%E5%AD%A6%E4%B9%A0/2021-10-14-JavaFx_tips/" class="article-date">
+  <time datetime="2021-10-14T14:52:00.000Z" itemprop="datePublished">2021-10-14</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a> / <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/%E7%BC%96%E7%A8%8B/">编程</a> / <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/%E7%BC%96%E7%A8%8B/java/">java</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">6 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setRotate()旋转角度</span><br><span class="line">setStyle(&quot;-fx-stroke:black;-fx-fill:red;&quot;);</span><br><span class="line">contains      </span><br><span class="line">setScaleX 缩放节点</span><br></pre></td></tr></table></figure>
+
+<h3 id="属性绑定"><a href="#属性绑定" class="headerlink" title="属性绑定"></a>属性绑定</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">centerX/YProperty.bind(  )</span><br><span class="line">d1.bindBidirectional(d2)双向绑定    </span><br><span class="line">			SimpleDoubleProperty</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Color"><a href="#Color" class="headerlink" title="Color"></a>Color</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">构造方法(r,g,b,透明度)   </span><br><span class="line">静态    Color.rgb(255,255,255)</span><br><span class="line">静态    Color.RED</span><br></pre></td></tr></table></figure>
+
+<h3 id="Font"><a href="#Font" class="headerlink" title="Font"></a>Font</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Font (size)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Image-x2F-ImageView"><a href="#Image-x2F-ImageView" class="headerlink" title="Image&#x2F;ImageView"></a>Image&#x2F;ImageView</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Image  (path/url)  </span><br><span class="line"></span><br><span class="line">ImageView(Image)   </span><br><span class="line">	setFitHeight/FitWidth 设置长宽</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//TextField 输入框</span><br><span class="line">// setPreColumnCount 列数</span><br><span class="line">//Label     文字栏</span><br><span class="line">//Button    按钮</span><br><span class="line">//</span><br></pre></td></tr></table></figure>
+
+<h3 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">str可用\n</span><br><span class="line">构造方法  Text(str)</span><br><span class="line">		 Text(x,y,str)</span><br><span class="line">underline:boolean</span><br><span class="line">strikethrough:boolean 删除线</span><br><span class="line">指定Font </span><br></pre></td></tr></table></figure>
+
+<h3 id="Line"><a href="#Line" class="headerlink" title="Line"></a>Line</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">startX/Y </span><br><span class="line">endX/Y</span><br><span class="line">Line(startx,starty,endx,endy)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Rectangle-矩形"><a href="#Rectangle-矩形" class="headerlink" title="Rectangle  矩形"></a>Rectangle  矩形</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x/y/width/height </span><br><span class="line">arcWidth/arvHEight  圆角弧度水平直径/垂直直径</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Shape"><a href="#Shape" class="headerlink" title="Shape"></a>Shape</h2><h3 id="Circle-与-Ellipse椭圆-与-ARC-弧度"><a href="#Circle-与-Ellipse椭圆-与-ARC-弧度" class="headerlink" title="Circle 与 Ellipse椭圆 与 ARC 弧度"></a>Circle 与 Ellipse椭圆 与 ARC 弧度</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">圆</span><br><span class="line">setCenterX/Y/Radius  半径</span><br><span class="line">setStroke/Fill 边框颜色/填充颜色</span><br><span class="line"></span><br><span class="line">椭圆</span><br><span class="line">centerX/Y </span><br><span class="line">radiusX/Y 水平/垂直半径</span><br><span class="line"></span><br><span class="line">ARC 弧度</span><br><span class="line">centerX/Y </span><br><span class="line">radiusX/Y 水平/垂直半径</span><br><span class="line">startAngle 起始角度 </span><br><span class="line">length     角度范围(逆时针旋转)</span><br><span class="line">type : ArcType.OPEN ArcType.CHORD ArcType.ROUND 弧度闭合类型</span><br></pre></td></tr></table></figure>
+
+<p>OPEN</p>
+<p><img src="https://tu.yegetables.com/images/2021/10/06/20211006163137.png" alt="image-20211006163130582"></p>
+<p>CHORD</p>
+<p><img src="https://tu.yegetables.com/images/2021/10/06/20211006163142.png" alt="image-20211006163142664"></p>
+<p>ROUND</p>
+<p><img src="https://tu.yegetables.com/images/2021/10/06/20211006163149.png" alt="image-20211006163149007"></p>
+<h3 id="点集连线-Polygon-与-Poltyline-不自动闭合"><a href="#点集连线-Polygon-与-Poltyline-不自动闭合" class="headerlink" title="点集连线 Polygon 与 Poltyline(不自动闭合)"></a>点集连线 Polygon 与 Poltyline(不自动闭合)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getPoints():list  </span><br><span class="line">向list 添加 坐标   (x1,y1,x2,y2)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tu.yegetables.com/images/2021/10/06/20211006165449.png" alt="image-20211006165449791"></p>
+<h1 id="Pane"><a href="#Pane" class="headerlink" title="Pane"></a>Pane</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setPadding(new Insets&#123;11,12,13,14&#125;) 设置 上下左右间距</span><br></pre></td></tr></table></figure>
+
+<h2 id="StackPane-中央-叠加"><a href="#StackPane-中央-叠加" class="headerlink" title="StackPane      中央  叠加"></a>StackPane      中央  叠加</h2><h2 id="FlowPane-水平-或-垂直-排列"><a href="#FlowPane-水平-或-垂直-排列" class="headerlink" title="FlowPane     (水平 或 垂直 )排列"></a>FlowPane     (水平 或 垂直 )排列</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">setAlignment(Pos.CENTER);整体对齐方式 默认 左对齐Pos.LEFT</span><br><span class="line"></span><br><span class="line">setH/Vgap() 水平间距/垂直间距</span><br><span class="line"></span><br><span class="line">setOrientation( Orientation.HORIZONTAL 水平排列默认/ Orientation.VERTICAL 垂直排列);</span><br></pre></td></tr></table></figure>
+
+<h2 id="GridPane-二维网格-单元格"><a href="#GridPane-二维网格-单元格" class="headerlink" title="GridPane      二维网格 单元格"></a>GridPane      二维网格 单元格</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setAlignment/H/Vgap 设置整体对齐/间距</span><br><span class="line">setGridLinesVisible 网格线可见</span><br><span class="line">add(Node,cloumn,row)/getCloumnIndex(node)获得节点列下标 </span><br><span class="line">setH/Valighnment   		设置单元格中子项的水平对齐方式/垂直对齐方式</span><br></pre></td></tr></table></figure>
+
+<h2 id="BorderPane-顶部-右边-底部-左边-中间"><a href="#BorderPane-顶部-右边-底部-左边-中间" class="headerlink" title="BorderPane    顶部 右边 底部 左边 中间"></a>BorderPane    顶部 右边 底部 左边 中间</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setTop setBottom setLeft setRight setCenter(Node)</span><br></pre></td></tr></table></figure>
+
+<h2 id="HBox-x2F-VBox-单行-x2F-列"><a href="#HBox-x2F-VBox-单行-x2F-列" class="headerlink" title="HBox&#x2F;VBox 单行&#x2F;列"></a>HBox&#x2F;VBox 单行&#x2F;列</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pane.setSpacing(8)  设置间距</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="滚动-ScrollPane"><a href="#滚动-ScrollPane" class="headerlink" title="滚动 ScrollPane"></a>滚动 ScrollPane</h2><h1 id="EVENT"><a href="#EVENT" class="headerlink" title="EVENT"></a>EVENT</h1><h2 id="ActionEvent"><a href="#ActionEvent" class="headerlink" title="ActionEvent"></a>ActionEvent</h2><p>( setOnAction)</p>
+<p>按钮 单击</p>
+<p>文本域 回车</p>
+<p>勾选 &#x2F;取消勾选 </p>
+<p>选择一个项 </p>
+<h2 id="MouseEvent"><a href="#MouseEvent" class="headerlink" title="MouseEvent"></a>MouseEvent</h2><p>按下  setOnMousePressed </p>
+<p>释放 setOnMouseReleased</p>
+<p>单击 setOnMouseClicked</p>
+<p>进入 setOnMouseEntered</p>
+<p>退出 setOnMouseExited</p>
+<p>移动 setOnMouseMoved</p>
+<p>拖动 setOnMouseDragged </p>
+<p>event   {</p>
+<p>is Alt &#x2F; Control &#x2F; Meta &#x2F; Shift Down ()  事件中 alt&#x2F;ctr&#x2F;鼠标中键&#x2F;shift 键是否按下</p>
+<p>getButton()     &#x2F;&#x2F;    枚举  左键MouseButton.PRIMARY    右键MouseButton.SECONDARY </p>
+<p>​						&#x2F;&#x2F;   中键MouseButton.MIDDLE  </p>
+<p> getX&#x2F;Y ()</p>
+<p>}</p>
+<h2 id="KeyEvent"><a href="#KeyEvent" class="headerlink" title="KeyEvent"></a>KeyEvent</h2><p>按下  setOnKeyPressed</p>
+<p>释放 setOnKeyReleased</p>
+<p>敲击 setOnKeyTyped       非Unicode 字符时 不调用 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">keyEvent&#123;</span><br><span class="line">	getCharacter</span><br><span class="line">	getCode</span><br><span class="line">	getText</span><br><span class="line">	</span><br><span class="line">	is Alt/Control/Meta/Shift Down</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">按下/释放     getcode 返回常量值  getText 描述  getCharacter 空</span><br><span class="line"></span><br><span class="line">敲击         getCode -&gt;UNDEFINED       getCharacter 返回UNicode字符/其他</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://tu.yegetables.com/images/2021/10/07/20211007163112.png" alt="image-20211007163111777"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">b.setOnKeyPressed(e -&gt; &#123;</span><br><span class="line">           switch (e.getCode())</span><br><span class="line">           &#123;</span><br><span class="line">               case UP:</span><br><span class="line">                   b.setY(b.getY() - 10);</span><br><span class="line">                   System.out.println(&quot;UP&quot;);</span><br><span class="line">                   break;</span><br><span class="line">               case DOWN:</span><br><span class="line">                   b.setY(b.getY() + 10);</span><br><span class="line">                   System.out.println(&quot;DOWN&quot;);</span><br><span class="line">                   break;</span><br><span class="line">               case LEFT:</span><br><span class="line">                   b.setX(b.getX() - 10);</span><br><span class="line">                   System.out.println(&quot;LEFT&quot;);</span><br><span class="line">                   break;</span><br><span class="line">               case RIGHT:</span><br><span class="line">                   b.setX(b.getX() + 10);</span><br><span class="line">                   System.out.println(&quot;RIGHT&quot;);</span><br><span class="line">                   break;</span><br><span class="line">               default:</span><br><span class="line">                   System.out.println(e.getText());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">       b.requestFocus();</span><br><span class="line">       //    一定是show之后才能 指定 某个 node 获取焦点 得到输入 </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">       //第二种方法     让 scence 指定 键盘监听   </span><br><span class="line">scence.setOnKeyPressed(   .........) </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Listener"><a href="#Listener" class="headerlink" title="Listener"></a>Listener</h2><p>可观察对象 的 addListener 方法  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">DoubleProperty dp=<span class="keyword">new</span> <span class="title class_">DoubleProperty</span>();</span><br><span class="line">dp.addListener( ov-&gt; sout(dp.value()));</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h1 id="Animation-动画"><a href="#Animation-动画" class="headerlink" title="Animation 动画"></a>Animation 动画</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">autoReverse  交替周期 是否需要倒转方向</span><br><span class="line">cycleCount    循环次数    Timeline.INDEFINITE 无限</span><br><span class="line">rate  速度</span><br><span class="line"></span><br><span class="line">status    &#123; Status.PAUSED  Status.RUNNING Status.STOPPED       &#125;</span><br><span class="line">pause() stop() play( )</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="PathTransition-节点沿路径"><a href="#PathTransition-节点沿路径" class="headerlink" title="PathTransition 节点沿路径"></a>PathTransition 节点沿路径</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">duration 持续时间</span><br><span class="line">node  变换的节点(移动物)</span><br><span class="line">orientation  方向     PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT  与路径切线垂直</span><br><span class="line">path  &lt;Shape&gt; 路径的形状</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">构造器 </span><br><span class="line">空</span><br><span class="line">(时间,路径)</span><br><span class="line">(时间,路径,节点)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> 		PathTransition pt = new PathTransition();</span><br><span class="line">        pt.setDuration(Duration.millis(1000));  //每次持续时间</span><br><span class="line">        pt.setPath(circle);</span><br><span class="line">        pt.setNode(rectangle);</span><br><span class="line">        pt.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);//方向 </span><br><span class="line">        pt.setAutoReverse(true);</span><br><span class="line">        pt.setRate(2.0);</span><br><span class="line">        pt.setCycleCount(Timeline.INDEFINITE);//无限次</span><br><span class="line">        pt.play();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="FadeTransition-改变透明度"><a href="#FadeTransition-改变透明度" class="headerlink" title="FadeTransition 改变透明度"></a>FadeTransition 改变透明度</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">duration  持续时间</span><br><span class="line">node </span><br><span class="line">fromValue</span><br><span class="line">toValue</span><br><span class="line">byValue  递增值</span><br></pre></td></tr></table></figure>
+
+<h2 id="TimeLine-自定义-关键帧"><a href="#TimeLine-自定义-关键帧" class="headerlink" title="TimeLine  自定义 关键帧"></a>TimeLine  自定义 关键帧</h2><p>对于每一个关键帧KeyFrame     定义 处理函数hander ,在该关键帧 结束后调用      EventHandler</p>
+<p>对于 Timeline   由若干个  关键帧 组成</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Text t = new Text(30, 30, &quot;11111&quot;);</span><br><span class="line">        EventHandler hander = e -&gt; &#123;</span><br><span class="line">            if (t.getText().length() == 0)</span><br><span class="line">            &#123;</span><br><span class="line">                t.setText(&quot;11111&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">            else</span><br><span class="line">            &#123;</span><br><span class="line">                t.setText(&quot;&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        Timeline tl = new Timeline(new KeyFrame(Duration.millis(1000), hander));</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="UI控件"><a href="#UI控件" class="headerlink" title="UI控件"></a>UI控件</h1><h2 id="Label-标签"><a href="#Label-标签" class="headerlink" title="Label 标签"></a>Label 标签</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">graphic   标签修饰的Node</span><br><span class="line"></span><br><span class="line">label.setContentDisplay( )</span><br><span class="line"> 	//常量    ContentDisplay.Top/BOTTOM/LEFT/RIGHT    结点相对于文本的位置</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Button"><a href="#Button" class="headerlink" title="Button"></a>Button</h2><p>onaction </p>
+<h2 id="CheckBox-复选框"><a href="#CheckBox-复选框" class="headerlink" title="CheckBox 复选框"></a>CheckBox 复选框</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">onaction()</span><br><span class="line"></span><br><span class="line">selected     :boolean</span><br><span class="line">isSelected()  判断选中</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="RadioButton-单选框-圆"><a href="#RadioButton-单选框-圆" class="headerlink" title="RadioButton 单选框(圆)"></a>RadioButton 单选框(圆)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">按钮组可以做到  互斥选择</span><br><span class="line">toggleGroup 字段 选择按钮组</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ToggleGroup tg=new ToggleGroup();</span><br><span class="line">rb1.setToggleGroup(tg);</span><br><span class="line">rb2.setToggleGroup(tg);</span><br><span class="line">rb3.setToggleGroup(tg);</span><br><span class="line">//添加 rb1/2/3到一个按钮组</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="TextField-文本域"><a href="#TextField-文本域" class="headerlink" title="TextField 文本域"></a>TextField 文本域</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">setEditable(false)    锁定不可变</span><br><span class="line">onaction() 回车 时触发一个ActionEvent</span><br><span class="line">prefColumnCount    列数  可设置</span><br></pre></td></tr></table></figure>
+
+<h2 id="TextArea-多行输入"><a href="#TextArea-多行输入" class="headerlink" title="TextArea 多行输入"></a>TextArea 多行输入</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">prefRowCount/prefRowCount 指定行列数</span><br><span class="line"></span><br><span class="line">wrapText: boolean 指定自动换行</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="滚动-ScrollPane-1"><a href="#滚动-ScrollPane-1" class="headerlink" title="滚动 ScrollPane"></a>滚动 ScrollPane</h2><p>一般是创建一个  ScrollPane 包裹着 TextArea </p>
+<p>可以上下左右滚动</p>
+<h2 id="组合框-x2F-下拉单向选择-ComboBox"><a href="#组合框-x2F-下拉单向选择-ComboBox" class="headerlink" title="组合框 &#x2F;下拉单向选择  ComboBox"></a>组合框 &#x2F;下拉单向选择  ComboBox</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ComboBox&lt;T&gt; cbo=new ComboBox&lt;&gt;();</span><br><span class="line">cbo.getItems.add/addALL( T values );</span><br><span class="line">cbo.setValue( T value1 )</span><br><span class="line">//cbo.setStyle  color</span><br><span class="line"></span><br><span class="line">被选中时 ActionEvent 触发</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="下拉多项选择-ListView"><a href="#下拉多项选择-ListView" class="headerlink" title="下拉多项选择 ListView"></a>下拉多项选择 ListView</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">items  选项们</span><br><span class="line">orientation: boolean   选项水平/垂直显示</span><br><span class="line">SelectionMode()   :&#123;</span><br><span class="line">			可设置  选择模式( 默认单选 SelectionMode.SINGLE/多选SelectionMode.MULTIPLE) </span><br><span class="line">			</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line"> //由列表  添加到选项列表</span><br><span class="line">  ListView&lt;String&gt; lv = new ListView&lt;&gt;();</span><br><span class="line">  ObservableList&lt;String&gt; ol = FXCollections.observableArrayList(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;, &quot;F&quot;);</span><br><span class="line">  lv.setItems(ol);</span><br><span class="line">   </span><br><span class="line"> // 设置 单选 多选</span><br><span class="line">  lv.getSelectionMode().setSelectionMode(SelectionMode.MULTIPLE);//先获取在设置</span><br><span class="line">  </span><br><span class="line">  //设置监听   已选择的内容</span><br><span class="line">   lv.getSelectionModel().selectedItemProperty().addListener(new ChangeListener&lt;String&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void changed(ObservableValue&lt;? extends String&gt; observable, String oldValue, String newValue) &#123;</span><br><span class="line">                System.out.println(&quot;oldvalue=&quot; + oldValue + &quot; newvalue=&quot; + newValue);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="滚动条-ScrollBar"><a href="#滚动条-ScrollBar" class="headerlink" title="滚动条 ScrollBar"></a>滚动条 ScrollBar</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">blockIncrement    单击按钮时改变的值</span><br><span class="line">max/min</span><br><span class="line">unitIncrement      调用方法时调整 滚动条的量</span><br><span class="line">value 当前值  0</span><br><span class="line">visibleAmount  选择块宽度 默认15</span><br><span class="line">oritntation : 方向 默认横向HORIZONTAL</span><br><span class="line">increment( )/decrement()    滚动条改变 unitIncrement 值 -+</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">监听改变</span><br><span class="line">ScrollBar 的 valueProperty().addListener()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Slider-滑动条-—-增强版滚动条"><a href="#Slider-滑动条-—-增强版滚动条" class="headerlink" title="Slider  滑动条   —-增强版滚动条"></a>Slider  滑动条   —-增强版滚动条</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">blockIncrement  单击时调节的值</span><br><span class="line">max/min/value</span><br><span class="line">oritntation : 方向 默认横向HORIZONTAL</span><br><span class="line">majorTickUnit/minorTickUnit 主刻度间隔距离/两个主刻度间的次刻度数</span><br><span class="line">showTickLabels/showTickMarks  :Boolean  是否显示 刻度标签/刻度</span><br><span class="line"></span><br><span class="line">监听</span><br><span class="line">监听改变</span><br><span class="line">Sl 的 valueProperty().addListener()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Media-影音"><a href="#Media-影音" class="headerlink" title="Media 影音"></a>Media 影音</h2><h3 id="Media"><a href="#Media" class="headerlink" title="Media"></a>Media</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">duration 持续时间/s</span><br><span class="line">width/height </span><br><span class="line"></span><br><span class="line">构造方法(url)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="MediaPlayer-播放和控制媒体"><a href="#MediaPlayer-播放和控制媒体" class="headerlink" title="MediaPlayer 播放和控制媒体"></a>MediaPlayer 播放和控制媒体</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">autoPlay :boolean 自动开始</span><br><span class="line">currentCount : readonly 已循环播放次数</span><br><span class="line">cycleCount   : 指定播放次数</span><br><span class="line">mute			:是否静音</span><br><span class="line">volume		:音量	</span><br><span class="line">totalDuration	:从开始到结束播放媒体的持续时间</span><br><span class="line">	</span><br><span class="line">pause()/play()</span><br><span class="line">seek()  定位到时间点  Duration.ZERO q</span><br><span class="line">构造( MEDIA )</span><br></pre></td></tr></table></figure>
+
+<h3 id="MediaView-显示视频"><a href="#MediaView-显示视频" class="headerlink" title="MediaView 显示视频"></a>MediaView 显示视频</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">x/y</span><br><span class="line">mediaPlayer</span><br><span class="line">fitWidth/fitHeight </span><br><span class="line"></span><br><span class="line">构造(MEDIAPLAYER)</span><br></pre></td></tr></table></figure>
+
+
+
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gui/" rel="tag">gui</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javaFx/" rel="tag">javaFx</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/%E5%AD%A6%E4%B9%A0/2021-10-19-java%E4%B8%AD%E7%9A%84_jdbc%E4%BD%BF%E7%94%A8%E5%85%A8%E8%A7%A3/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Java中的 Jdbc使用全解
+          
+        </div>
+      </a>
+    
+    
+      <a href="/%E5%AD%A6%E4%B9%A0/2021-10-14-java%E7%BA%BF%E7%A8%8B_%E5%9F%BA%E7%A1%80/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Java线程 基础</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2018-2022
+        <i class="ri-heart-fill heart_icon"></i> ajian
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="https://tu.yegetables.com/images/2021/02/08/av_1607916041.jpg" alt="Copy on Write"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/feed" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+ 
+<script src="/js/dz.js"></script>
+ 
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>

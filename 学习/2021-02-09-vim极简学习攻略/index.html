@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="随缘更新技术文章" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Vim极简学习攻略 |  Copy on Write</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="https://tu.yegetables.com/images/2021/02/08/1612775550764_192x192.png" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/feed.xml" title="Copy on Write" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-学习/2021-02-09-vim极简学习攻略"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Vim极简学习攻略
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/%E5%AD%A6%E4%B9%A0/2021-02-09-vim%E6%9E%81%E7%AE%80%E5%AD%A6%E4%B9%A0%E6%94%BB%E7%95%A5/" class="article-date">
+  <time datetime="2021-02-09T08:50:00.000Z" itemprop="datePublished">2021-02-09</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a> / <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/%E7%BC%96%E7%A8%8B/">编程</a> / <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/%E7%BC%96%E7%A8%8B/linux/">linux</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.3k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">5 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>笔者使用 vim 很久了,但是一直以来对于 vim 的各种配置、快捷键、插件等的接触都避讳莫深。原因很简单–麻烦。</p>
+<p>但是 vim&#x2F;vi 作为任何一个 linux 系统存在的文本编辑软件,学会使用对于我们来说是非常必要的。</p>
+<p>借此机会我会整理一波最快的记忆最少的 vim 使用方法。</p>
+<h1 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h1><h2 id="打开"><a href="#打开" class="headerlink" title="打开"></a>打开</h2><p>命令行直接使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim + 文件名 (不存在则新建,存在则打开)</span><br></pre></td></tr></table></figure>
+
+<h2 id="模式介绍"><a href="#模式介绍" class="headerlink" title="模式介绍"></a>模式介绍</h2><p>直接打开默认进入 [<code>一般模式</code>](command mode)</p>
+<p><code>一般模式</code> 下按下 <code>a i o</code> 任意一个进入[<code>编辑模式</code>](insert mode)</p>
+<p><code>一般模式</code> 下输入 <code>: / ?</code> 任意一个进入[<code>命令行模式</code>](command-line mode)</p>
+<p>被别的模式下按下 <code>esc</code> 返回 <code>一般模式</code></p>
+<h2 id="1-键位-常用"><a href="#1-键位-常用" class="headerlink" title="1.键位(常用)"></a>1.键位(常用)</h2><ul>
+<li><h3 id="在一般模式下"><a href="#在一般模式下" class="headerlink" title="在一般模式下"></a>在一般模式下</h3><ul>
+<li>直接输入 <code>2↓</code> 、<code>10↑</code> 等移动 其中 <code>3&lt;enter&gt;</code> 相当于 <code>3↓</code></li>
+<li><code>home</code>、<code>end</code> 移动当前列最前面、最后面</li>
+<li>大写 <code>G</code> 移动到最后,还有 <code>nG</code></li>
+<li><code>gg</code> 移动到最前</li>
+<li><code>dd</code> 删除一整行,还有 <code>ndd</code></li>
+<li><code>/word</code> 当前文件中往光标下搜 word<br><code>n</code> 继续搜 、<code>N</code> 反向搜</li>
+<li><code>x</code> 相当于 <code>del</code>、 <code>X</code> 相当于 <code>backspace</code><br>所以 <code>3x</code> 、 <code>10X</code></li>
+<li><code>yy</code> 复制本行,还有 <code>nyy</code></li>
+<li><code>dG</code> 删除直到最后一行所有</li>
+<li><code>dnG</code>, <code>d1G</code> 删除知道第 n 行所有</li>
+<li>本行中 <code>d0</code> 删除光标之前 <code>d$</code> 删除光标之后</li>
+<li><code>ynG</code> 类似复制 <code>y1G</code> ,<code>yG</code> 复制到文件末,<code>y0</code>,<code>y$</code> 本行复制</li>
+<li><code>p</code> 粘贴到下一列</li>
+<li><code>u</code> 撤销 <code>&lt;ctrl&gt;+r</code>前进</li>
+<li><code>.</code> 重复上个动作</li>
+<li><code>&lt;ctrl&gt;+v</code> 视图模式</li>
+<li><code>:wq</code>保存退出</li>
+<li><code>:w filename</code> 另存为</li>
+<li><code>:e!</code> 还原成初始状态</li>
+</ul>
+</li>
+<li><h3 id="多文件"><a href="#多文件" class="headerlink" title="多文件"></a><strong><em>多文件</em></strong></h3><ul>
+<li><code>:e filename</code> 再打开一个文件</li>
+<li><code>:files</code> 查看已打开文件</li>
+<li><code>:bn</code> <code>:bp</code> 切换文件 (<code>:bN</code>也行)</li>
+<li><code>:sp</code> 垂直分割 <code>:vs</code> 水平分割</li>
+<li><code>&lt;ctrl&gt;+w+w</code>切换焦点窗口</li>
+</ul>
+</li>
+<li><h3 id="不太常用-难记"><a href="#不太常用-难记" class="headerlink" title="不太常用(难记)"></a>不太常用(难记)</h3><ul>
+<li><strong><code>:1,$s/word1/word2/gc</code></strong> 解释<br>第一行 到 最后一行 之间 找 word1 替换成 word2<br>参数 c 询问用户</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-配置文件-vimrc"><a href="#2-配置文件-vimrc" class="headerlink" title="2.配置文件.vimrc"></a>2.配置文件.vimrc</h2><p>.vimrc 文件放置于~&#x2F;目录下,没有则新建</p>
+<p>在这里贴上我的,其他功能可以自己根据需要自行添加,更改后保存重启 vim 生效</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&quot; 显示中文帮助</span><br><span class="line">if version &gt;= 603</span><br><span class="line">	    set helplang=cn</span><br><span class="line">	        set encoding=utf-8</span><br><span class="line">	endif</span><br><span class="line">&quot; 设置鼠标可用</span><br><span class="line">set mouse=a</span><br><span class="line">&quot; 显示行号</span><br><span class="line">set number</span><br><span class="line">&quot; Tab 键的宽度</span><br><span class="line">set tabstop=4</span><br><span class="line">&quot; 统一缩进为 4</span><br><span class="line">set softtabstop=4</span><br><span class="line">set shiftwidth=4</span><br><span class="line">&quot; 不要使用 vi 的键盘模式，而是 vim 自己的</span><br><span class="line">set nocompatible</span><br><span class="line">&quot; 语法高亮</span><br><span class="line">&quot;set syntax=on</span><br><span class="line"> &quot;Ctrl-A 选中所有内容</span><br><span class="line">map &lt;silent&gt;  &lt;C-A&gt;  gg v G</span><br><span class="line">&quot;按TAB键时命令行自动补齐&quot;</span><br><span class="line">set wildmenu</span><br><span class="line">&quot;开启文件类型检查</span><br><span class="line">filetype indent on</span><br><span class="line"></span><br><span class="line">set showmatch</span><br><span class="line">&quot;光标遇到圆括号、方括号、大括号时，自动高亮对应的另一个圆括号、方括号和大括号</span><br><span class="line">set spell spelllang=en_us</span><br><span class="line">&quot;打开英语单词的拼写检查</span><br><span class="line">set history=1000</span><br><span class="line">&quot;Vim 需要记住多少次历史操作</span><br><span class="line">set autoread</span><br><span class="line">&quot;打开文件监视。如果在编辑过程中文件发生外部改变（比如被别的编辑器编辑了），就会发出提示</span><br><span class="line"></span><br><span class="line">colorscheme elflord</span><br><span class="line">&quot;设置vim主题配色</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-插件配置与语法补全"><a href="#3-插件配置与语法补全" class="headerlink" title="3.插件配置与语法补全"></a>3.插件配置与语法补全</h2><h3 id="vim-plug"><a href="#vim-plug" class="headerlink" title="vim-plug"></a><a href="https://github.com/junegunn/vim-plug">vim-plug</a></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">优点</span><br><span class="line">1. 易于设置：单个文件。无需样板代码。</span><br><span class="line">2. 易于使用：简洁直观的语法</span><br><span class="line">3. 超高速并行安装/更新（与任何的+job，+python，+python3，+ruby，或Neovim）</span><br><span class="line">4. 创建浅克隆，以最大程度地减少磁盘空间使用和下载时间</span><br><span class="line">5. 按需加载可加快启动时间</span><br><span class="line">6. 可以查看和回滚更新</span><br><span class="line">7. 分支/标签/提交支持</span><br><span class="line">8. 更新后挂钩</span><br><span class="line">9. 支持外部管理的插件</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-vim-plug"><a href="#安装-vim-plug" class="headerlink" title="安装 vim-plug"></a>安装 vim-plug</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/.vim/autoload/</span><br><span class="line">cd ~/.vim/autoload/</span><br><span class="line">wget https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim</span><br></pre></td></tr></table></figure>
+
+<p>或者直接</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fLo ~/.vim/autoload/plug.vim --create-dirs \</span><br><span class="line">    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim</span><br></pre></td></tr></table></figure>
+
+<p>日常使用时,在<code>~/.vimrc</code>文件增加一段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">call plug#begin(&#x27;~/.vim/plugged&#x27;)</span><br><span class="line">--------------</span><br><span class="line">&quot;插件名称</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--------------</span><br><span class="line">plug#end()</span><br></pre></td></tr></table></figure>
+
+<h3 id="语法补全"><a href="#语法补全" class="headerlink" title="语法补全"></a>语法补全</h3><p><strong><em>特别(c&#x2F;c++)</em></strong><br>在命令行安装 ccls<br>例如 ubuntu : <code>sudo apt-get install ccls</code></p>
+<ol>
+<li>添加插件在配置文件 <code>~/.vimrc</code> 的<code>call plug#begin</code> 与 <code>plug#end() </code>中间</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Plug &#x27;neoclide/coc.nvim&#x27;, &#123;&#x27;branch&#x27;: &#x27;release&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>命令行直接 vim 进入界面 ,输入<code>:PlugInstall</code> 等待安装完成</p>
+</li>
+<li><p>打开<a href="https://github.com/neoclide/coc.nvim/wiki/Language-servers#ccobjective-c">Language servers</a>找到自己需要的语法补全配置(c&#x2F;c++ 直接复制 ccls 的配置文件),复制到剪贴板</p>
+</li>
+<li><p>输入<code>:CocConfig</code> ,按 i 进入编辑模式 ,粘贴刚才复制得到的配置,多种语言配置文件以逗号隔开,最外层补上一对大括号,保存退出</p>
+</li>
+<li><p>测试补全效果,一般不会报错,报错自己寻找解决办法</p>
+</li>
+</ol>
+<h1 id="尾言"><a href="#尾言" class="headerlink" title="尾言"></a>尾言</h1><p>至此,常用的 vim 使用方法已经摸索清楚了, 笔者还遇到了不同文件间的复制粘贴等问题,并且顺利找到了解决方法,希望感兴趣的读者自行摸索。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vim/" rel="tag">vim</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/%E5%AD%A6%E4%B9%A0/2021-02-28-linux2018-2020%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Linux2018-2020面试题知识点总结
+          
+        </div>
+      </a>
+    
+    
+      <a href="/%E5%AD%A6%E4%B9%A0/2020-12-19-%E9%93%BE%E8%A1%A8%E9%83%A8%E5%88%86%E8%8A%82%E7%82%B9%E9%80%92%E5%BD%92%E9%80%86%E5%BA%8F/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">链表部分节点递归逆序</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2018-2022
+        <i class="ri-heart-fill heart_icon"></i> ajian
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="https://tu.yegetables.com/images/2021/02/08/av_1607916041.jpg" alt="Copy on Write"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/feed" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+ 
+<script src="/js/dz.js"></script>
+ 
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
