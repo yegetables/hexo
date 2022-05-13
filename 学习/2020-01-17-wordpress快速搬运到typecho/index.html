@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="随缘更新技术文章" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Wordpress快速搬运到typecho |  Copy on Write</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="https://tu.yegetables.com/images/2021/02/08/1612775550764_192x192.png" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/feed.xml" title="Copy on Write" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-学习/2020-01-17-wordpress快速搬运到typecho"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Wordpress快速搬运到typecho
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/%E5%AD%A6%E4%B9%A0/2020-01-17-wordpress%E5%BF%AB%E9%80%9F%E6%90%AC%E8%BF%90%E5%88%B0typecho/" class="article-date">
+  <time datetime="2020-01-17T15:52:00.000Z" itemprop="datePublished">2020-01-17</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a> / <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/%E5%8D%9A%E5%AE%A2/">博客</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">478</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">1 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>上周末, 花了些时间将微博之博的程序从wordpress转到了typecho, 转换过程很顺利, 没有碰到什么问题. 之所以转程序, 是因为微博之博还有点访问量, 而这个访问量导致wordpress长期大量占用服务器资源. 不得已才转Typecho试试的.</p><p>转完以后, 才发现, 改改Typecho的代码, 装一些插件, 基本能让Typecho和wordpress功能一致. 当然wordpress那丰富的插件和主题资源是Typecho所不能比拟的.</p><p>废话不多说, 下面就是说说怎么转换具体步骤, 转换效果请看 <a href="http://itwwt.com" target="_blank" rel="noopener noreferrer">微博之博</a>:</p><h4>1. 转换程序</h4><p><span style="color: #ff0000;">实践证明, 下面过程也适用于最新版的wordpress转换, 我的wordpress就是3.4.1</span></p><blockquote><p>首先安装typecho0.8程序，安装之前请确认你的服务器支持PHP5。</p><p>下载地址：http://typecho.org/download</p><p>wordpress转typecho插件下载：<a href="http://docs.typecho.org/plugins/wordpress-to-typecho">http://docs.typecho.org/plugins/wordpress-to-typecho</a></p><p>然后将已经安装在空间里的wordpress博客移动到子目录（文件和数据建议先做好备份，以免出错）。</p><p>然后再安装typecho程序，接着将插件Wordpress to Typecho上传到typecho\usr\plugins 目录，在后台启用插件后便可以在确认了数据库信息后将文章和评论转换过来。</p><p>由于程序目前还没有友情链接的功能，链接的数据不会转换，需要手动添加链接。</p></blockquote><p>参考来源: <a href="http://www.weidao.net/1078.html">wordpress 3.2 程序转typecho最新教程</a></p><h4>2. 更换文章图片地址</h4><p>wordpress的图片保存在 /usr/uploads/ , 而Typecho则是保存在 /usr/uploads. 这时我们除了需要把 /usr/uploads/ 所有图片文件转移到 /usr/uploads 外, 还需要在phpmyadmin中执行以下SQL, 以将wordpress图片路径替换成Typecho的:</p><blockquote>UPDATE typecho_contents SET text = REPLACE(text,'http://xx.com/usr/uploads/','http://xx.com/usr/uploads/');</blockquote><h4>3. 如何在导航上显示目录分类</h4><p>找到header.php中:</p><blockquote><li<?php if($this-&gt;is('index')): ?&gt; class="current"<?php endif; ?&gt;&gt;<a href="<?php $this-&gt;options-&gt;siteUrl(); ?&gt;"&gt;首页</a&gt;</li&gt;<br/> <?php $this-&gt;widget('Widget_Contents_Page_List')-&gt;to($pages); ?&gt;<br/> <?php while($pages-&gt;next()): ?&gt;<br/> <li<?php if($this-&gt;is('page', $pages-&gt;slug)): ?&gt; class="current"<?php endif; ?&gt;&gt;<a href="<?php $pages-&gt;permalink(); ?&gt;" title="<?php $pages-&gt;title(); ?&gt;"&gt;<?php $pages-&gt;title(); ?&gt;</a&gt;</li&gt;<br/> <?php endwhile; ?&gt;</blockquote><p>替换为</p><blockquote><li<?php if($this-&gt;is('index')): ?&gt; class="current"<?php endif; ?&gt;&gt;<a href="<?php $this-&gt;options-&gt;siteUrl(); ?&gt;"&gt;<?php _e('首页'); ?&gt;</a&gt;</li&gt;<br/> <?php $this-&gt;widget('Widget_Metas_Category_List')-&gt;to($category); ?&gt;<br/> <?php while($category-&gt;next()): ?&gt;<br/> <li<?php if($this-&gt;is('category', $category-&gt;slug)): ?&gt; class="current"<?php endif; ?&gt;&gt;<a href="<?php $category-&gt;permalink(); ?&gt;" title="<?php $category-&gt;title(); ?&gt;"&gt;<?php $category-&gt;name(); ?&gt;</a&gt;</li&gt;<br/> <?php endwhile; ?&gt;</blockquote><p>参考来源: <a title="http://forum.typecho.org/topic.php?id=2414" href="http://forum.typecho.org/topic.php?id=2414">http://forum.typecho.org/topic.php?id=2414</a></p><h4>4. 首页显示摘要</h4><p>找到index.php</p><p>将</p><blockquote><?php $this-&gt;content('阅读剩余部分...'); ?&gt;</blockquote><p>替换为</p><blockquote><?php $this-&gt;excerpt(); ?&gt;</blockquote><p>如果想精确控制摘要字数, 则</p><blockquote><?php $this-&gt;excerpt(200, '...');//200就是摘要的字数 ?&gt;</blockquote><p>参考来源: <a href="http://www.52coding.cn/idlernet/blog/index.php/default/8.html">Typecho 首页显示摘要的小窍门</a></p><h4>5. 首页显示缩略图</h4><p>请安装这个插件: <a title="http://typecho.us/plugins/thumbnail.html" href="http://typecho.us/plugins/thumbnail.html">http://typecho.us/plugins/thumbnail.html</a></p><p><span style="color: #ff0000;">首次使用这个插件注意去手动创建下面的目录:</span></p><blockquote>/usr/resources/cate/<br/> /usr/resources/rand/</blockquote><p><span style="color: #ff0000;">不然是无法显示下面的默认图片地址的:</span></p><blockquote>/usr/plugins/Thumbnail/default.png</blockquote><h4>6. TypechoPing自动更新服务</h4><p>请安装这个插件: <a title="http://typecho.us/plugins/typecho-ping.html" href="http://typecho.us/plugins/typecho-ping.html">http://typecho.us/plugins/typecho-ping.html</a></p><h4>7. 显示文章浏览数</h4><p>请安装这个插件: <a title="http://typecho.us/plugins/post-views.html" href="http://typecho.us/plugins/post-views.html">http://typecho.us/plugins/post-views.html</a></p><h4>8. 博客sitemap功能</h4><p><a title="http://typecho.us/plugins/google-sitemap.html" href="http://typecho.us/plugins/google-sitemap.html">http://typecho.us/plugins/google-sitemap.html</a></p><h4>9. 关键词内链工具</h4><p><a title="http://typecho.us/plugins/hight-light-tag.html" href="http://typecho.us/plugins/hight-light-tag.html">http://typecho.us/plugins/hight-light-tag.html</a></p><p><span style="color: #ff0000;">这个插件只能根据当前文章的tag找到文章的关键词并链接.</span></p><h4>10. 如何反垃圾评论</h4><p><a title="http://typecho.us/plugins/comment-filter.html" href="http://typecho.us/plugins/comment-filter.html">http://typecho.us/plugins/comment-filter.html</a></p><p>按文中作如下设置即可:</p><blockquote>设置非中文直接失败，以及带有http/com/net等敏感关键词，需要审核后显示</blockquote><h4>11. 将带WWW的网址转向不带WWW的网址</h4><p>在.htaccess中加入:</p><blockquote>RewriteCond %{HTTP_HOST} ^www.itwwt.com [NC]<br/> RewriteRule ^(.*)$ <a href="http://itwwt.com/">http://itwwt.com/</a>$1 [L,R=301]</blockquote><p>比如我的完整.htaccess就是:</p><blockquote><p><IfModule mod_rewrite.c&gt;</p><p>RewriteEngine On<br/> RewriteBase /<br/> RewriteCond %{HTTP_HOST} ^www.itwwt.com [NC]<br/> RewriteRule ^(.*)$ <a href="http://itwwt.com/">http://itwwt.com/</a>$1 [L,R=301]<br/> RewriteCond %{REQUEST_FILENAME} !-f<br/> RewriteCond %{REQUEST_FILENAME} !-d<br/> RewriteRule ^(.*)$ /index.php/$1 [L]</p><p></IfModule&gt;</p></blockquote><h4>12. <a href="http://blog.fengyiyi.com/archives/Typecho%E4%BF%AE%E6%94%B9header-php%E8%87%AA%E5%AE%9A%E4%B9%89%E5%A4%B4%E9%83%A8%E8%BE%93%E5%87%BA%E4%BF%A1%E6%81%AF.html" target="_blank" rel="noopener noreferrer">Typecho修改header.php自定义头部输出信息</a></h4><p><?php$this-&gt;header('keywords=&generator=&template=&pingback=&xmlrpc=&wlw=');?&gt;</p><p>操作参数及方法说明</p><p>keywords：关键词<br/> description：描述、摘要<br/> rss1：feed rss1.0<br/> rss2：feed rss2.0<br/> atom：feed atom<br/> generator：程序版本等<br/> template：模板名称<br/> pingback：文章引用<br/> xmlrpc：离线写作<br/> wlw：...</p><p>commentReply: 不输出评论回复js</p><p>注：等号（=）为空则不输出该项目，各个参数之间使用 “&” 连接。 如果需要自定义rss地址，只填上 rss2=feed订阅地址 即可。</p><p>最后, 推荐一个专门收集Typecho插件的网站: <a title="http://typecho.us/" href="http://typecho.us/">http://typecho.us/</a>, 非常不错哦.</p><p>Typecho唯一遗憾的地方是: 由于使用人数不如wordpress广泛, 所以还没有哪个社会化评论为它开发评论插件. 如果用社会化评论的通用代码的话, 最新评论, 评论数量和评论定时保存到本地都是一个很大的问题. 当然, 如果你不用社会化评论而用Typecho默认评论功能的话, 这个问题就不是问题了.</p> 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/typecho/" rel="tag">typecho</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/uploads/" rel="tag">uploads</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/usr/" rel="tag">usr</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/wordpress/" rel="tag">wordpress</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BB%A3%E7%A0%81/" rel="tag">代码</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%8F%92%E4%BB%B6/" rel="tag">插件</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%96%87%E4%BB%B6/" rel="tag">文件</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">服务器</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%9B%AE%E5%BD%95/" rel="tag">目录</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%AB%99/" rel="tag">网站</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BD%AC%E6%8D%A2/" rel="tag">转换</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%97%AE%E9%A2%98/" rel="tag">问题</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/%E7%94%9F%E6%B4%BB/%E5%A5%A5%E7%89%B9%E6%9B%BC%E7%B3%BB%E5%88%97%E7%9A%84%E8%A7%82%E7%9C%8B%E9%A1%BA%E5%BA%8F/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            奥特曼系列的观看顺序
+          
+        </div>
+      </a>
+    
+    
+      <a href="/%E5%AD%A6%E4%B9%A0/2019-12-05-%E4%B8%BB%E9%A2%98%E4%BB%A3%E7%A0%81%E4%BD%BFwordpress%E8%AF%84%E8%AE%BA%E5%8F%AF%E8%A7%81/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">主题代码使Wordpress评论可见</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2018-2022
+        <i class="ri-heart-fill heart_icon"></i> ajian
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="https://tu.yegetables.com/images/2021/02/08/av_1607916041.jpg" alt="Copy on Write"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/feed" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+ 
+<script src="/js/dz.js"></script>
+ 
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
