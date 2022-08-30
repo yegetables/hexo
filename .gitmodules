@@ -1,6 +1,6 @@
 [submodule "source"]
-	path = source
-	url = git@github.com:ajian2002/blogs
-[submodule "themes/Hingle-pro"]
-	path = themes/Hingle-pro
-	url = git@github.com:ajian2002/Hingle-pro
+path = source
+url = git@github.com:ajian2002/blogs
+[submodule "themes/hingle"]
+path = themes/hingle
+url = git@github.com:ajian2002/Hingle-pro
