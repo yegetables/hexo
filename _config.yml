@@ -4,19 +4,19 @@
 
 # Site
 title: Copy on Write
-subtitle: 'yegetables'
-description: '随缘更新技术文章'
-keywords: 
+subtitle: "yegetables"
+description: "随缘更新技术文章"
+keywords:
 author: ajian
 language: zh-CN
-timezone: 'Asia/Shanghai'
+timezone: "Asia/Shanghai"
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: http://yegetables.com
 permalink: :title/
 permalink_defaults:
-pretty_urls: 
+pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
 
@@ -37,7 +37,7 @@ titlecase: true # Transform title into titlecase
 external_link:
   enable: false # Open external links in new tab
   field: site # Apply to the whole site
-  exclude: ''
+  exclude: ""
 filename_case: 0
 render_drafts: false
 post_asset_folder: true
@@ -47,21 +47,21 @@ highlight:
   enable: true
   line_number: true
   auto_detect: false
-  tab_replace: ''
+  tab_replace: ""
   wrap: true
   hljs: false
 prismjs:
   enable: false
   preprocess: true
   line_number: true
-  tab_replace: ''
+  tab_replace: ""
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
 # order_by: Posts order. (Order by date descending by default)
 index_generator:
-  path: ''
+  path: ""
   per_page: 10
   order_by: -date
 
@@ -81,7 +81,7 @@ meta_generator: true
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 ## updated_option supports 'mtime', 'date', 'empty'
-updated_option: 'date'
+updated_option: "date"
 
 # Pagination
 ## Set per_page to 0 to disable pagination
@@ -103,8 +103,7 @@ theme: hingle
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: https://github.com/ajian2002/hexo  
-  # example, https://github.com/hexojs/hexojs.github.io
+  repo: https://github.com/ajian2002/hexo
   branch: [public]
   # token: ''
 
@@ -114,13 +113,17 @@ search:
   field: post
   format: html
 
-
+# hexo-generator-feed
 feed:
-  type: feed
-  path: feed
-  limit: 20
+  enable: true
+  type: rss2
+  path: feed.xml
+  limit:
   hub:
   content:
   content_limit: 140
   content_limit_delim: " "
   order_by: -date
+  icon:
+  autodiscovery: true
+  template:
